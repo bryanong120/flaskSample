@@ -11,15 +11,13 @@ pipeline {
   }
 
   stages {
-    stage('Bootstrap services') {
-      agent any
-      steps {
-        script {
-          sh "docker network create ${NETWORK} || true"
-          CHROME = docker.image('seleniarm/standalone-chromium:latest').run("--name ${CHROME_CONTAINER} --network ${NETWORK} --shm-size=2g")
-        }
-      }
-    }
+
+    stage('OWASP DependencyCheck') {
+			steps {
+				dependencyCheck additionalArguments: '--format HTML --format XML', odcInstallation: 'Default'
+			}
+		}
+
 
     stage('Build and Test') {
       agent {
@@ -32,7 +30,6 @@ pipeline {
       steps {
         sh 'pip install -r requirements.txt'
         sh 'python app.py &'
-        sh "pytest --driver Remote --selenium-host ${WEBDRIVER_HOST} --selenium-port 4444 --capability browserName chrome"
       }
     }
 
@@ -40,13 +37,6 @@ pipeline {
   post {
     always {
       node(null) {
-        script {
-          if (CHROME) {
-            CHROME.stop()
-          }
-
-          sh "docker network rm ${NETWORK} || true"
-        }
       }
     }
   }
