@@ -24,7 +24,7 @@ pipeline {
     stage('Build and Test') {
       agent {
         docker {
-            image 'python:3.10'
+            image 'python:3.8'
             args "-u root --network ${NETWORK} --name ${APP_CONTAINER}"
         }
       }

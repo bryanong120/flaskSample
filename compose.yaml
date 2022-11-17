@@ -1,7 +1,10 @@
 version: '3.8'
 
 services:
-  app:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
 
   jenkins:
     container_name: ci-jenkins
@@ -44,6 +47,7 @@ services:
   sonarqube:
     container_name: ci-sonarqube
     image: sonarqube:community
+    platform: linux/amd64
     user: 1000:1000
     environment:
       SONAR_TELEMETRY_ENABLE: false
